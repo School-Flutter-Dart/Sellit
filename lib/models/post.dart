@@ -6,6 +6,8 @@ enum Category { test }
 class Post{
   ///The title of the post.
   String title;
+
+  ///The content of post.
   String content;
   double price;
   String postId;
