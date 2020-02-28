@@ -48,7 +48,7 @@ class _PostCardState extends State<PostCard> {
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.all(12),
-                      child: Text(widget.post.price.toString()),
+                      child: Text("\$${widget.post.price.toString()}", style: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),),
                     )
                   ],
                 ),

@@ -16,8 +16,8 @@ class _MainPageState extends State<MainPage> {
 
   List<Widget> cards = <Widget>[
     PostCard(
-      color: Colors.orange,
-      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
+      color: Colors.black12,
+      post: Post.createNewPost(title: "Something", price: 2.99, content: "this works great"),
     ),
     PostCard(
       color: Colors.pink,

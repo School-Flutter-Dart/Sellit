@@ -4,11 +4,14 @@ enum Category { test }
 
 
 class Post{
+  ///The title of the post.
   String title;
   String content;
   double price;
   String postId;
   String postUserId;
+  ///The bytes data of images of the post.
+  List<List<int>> imageBytes;
 
   Post({this.content, this.title, this.postId, this.postUserId, this.price});
 
