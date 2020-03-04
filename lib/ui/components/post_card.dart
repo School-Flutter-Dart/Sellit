@@ -48,6 +48,34 @@ class _PostCardState extends State<PostCard> {
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.all(12),
+                      child: Text("${widget.post.title}", style: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 3,
+              child: Container(
+                child: Flex(
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Text("${widget.post.content}", style: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 3,
+              child: Container(
+                child: Flex(
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(12),
                       child: Text("\$${widget.post.price.toString()}", style: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),),
                     )
                   ],

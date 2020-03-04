@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:sellit/models/post.dart';
-import 'package:sellit/models/user.dart';
+import 'package:sellit/bloc/post_bloc.dart';
 
 class PostDetailPage extends StatefulWidget {
   final Color color;
