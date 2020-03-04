@@ -69,7 +69,14 @@ class _MainPageState extends State<MainPage> {
             children: <Widget>[
               Flexible(
                 flex: 1,
-                child: Container(),
+                child: DragTarget(
+                  onAccept: (_) {
+                    print("unliked");
+                  },
+                  builder: (_, __, ___) {
+                    return Container();
+                  },
+                ),
               ),
               Stack(
                 children: <Widget>[
@@ -108,7 +115,7 @@ class _MainPageState extends State<MainPage> {
                 flex: 1,
                 child: DragTarget(
                   onAccept: (_) {
-                    print("accepted");
+                    print("liked");
                   },
                   builder: (_, __, ___) {
                     return Container();
