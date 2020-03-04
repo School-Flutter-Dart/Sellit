@@ -2,9 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sellit/bloc/post_bloc.dart';
 
 import 'components/post_card.dart';
 import 'post_detail_page.dart';
+import 'post_edit_page.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -14,24 +18,26 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   PageController pageController = PageController();
 
-  List<Widget> cards = <Widget>[
-    PostCard(
-      color: Colors.black12,
-      post: Post.createNewPost(title: "Something", price: 2.99, content: "this works great"),
-    ),
-    PostCard(
-      color: Colors.pink,
-      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
-    ),
-    PostCard(
-      color: Colors.purple,
-      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
-    ),
-    PostCard(
-      color: Colors.tealAccent,
-      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
-    ),
-  ];
+  List<Post> posts = [];
+
+//  List<Widget> cards = <Widget>[
+//    PostCard(
+//      color: Colors.black12,
+//      post: Post.createNewPost(title: "Something", price: 2.99, content: "this works great"),
+//    ),
+//    PostCard(
+//      color: Colors.pink,
+//      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
+//    ),
+//    PostCard(
+//      color: Colors.purple,
+//      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
+//    ),
+//    PostCard(
+//      color: Colors.tealAccent,
+//      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
+//    ),
+//  ];
 
   Widget child;
 
@@ -42,6 +48,11 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+
+//    Firestore.instance.collection('books').document()
+//        .setData({ 'title': 'title', 'author': 'author' });
+
+    postBloc.fetchAllPosts();
 
     pageController.addListener(() {
       setState(() {
@@ -60,70 +71,89 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(),
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Flexible(
-                flex: 1,
-                child: DragTarget(
-                  onAccept: (_) {
-                    print("unliked");
-                  },
-                  builder: (_, __, ___) {
-                    return Container();
-                  },
-                ),
-              ),
-              Stack(
-                children: <Widget>[
-                  Draggable(
-                    childWhenDragging: Transform.scale(
-                      scale: 0.9,
-                      child: index + 1 < cards.length ? cards[index + 1] : cards[0],
-                    ),
-                    feedback: cards[index],
-                    onDragStarted: onDragStarted,
-                    onDragCompleted: () {
-                      if (index + 1 < cards.length) {
-                        setState(() {
-                          ++index;
-                        });
-                      } else {
-                        setState(() {
-                          index = 0;
-                        });
-                      }
-                    },
-                    onDragEnd: (_) {},
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(CupertinoPageRoute(builder: (_) => PostDetailPage(color: Colors.blue)));
-                      },
-                      child: Hero(
-                        tag: "main",
-                        child: cards[index],
+        floatingActionButton: FloatingActionButton(child: Icon(Icons.add),onPressed: (){
+          Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PostEditPage()));
+        }),
+        body: StreamBuilder(
+          stream: postBloc.posts,
+          builder: (_, AsyncSnapshot<List<Post>> snapshot){
+            if(snapshot.hasData){
+              posts = snapshot.data;
+
+              if(posts.isNotEmpty){
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        child: DragTarget(
+                          onAccept: (_) {
+                            print("unliked");
+                          },
+                          builder: (_, __, ___) {
+                            return Container();
+                          },
+                        ),
                       ),
-                    ),
+                      Stack(
+                        children: <Widget>[
+                          Draggable(
+                            childWhenDragging: Transform.scale(
+                              scale: 0.9,
+                              child: PostCard(post: index + 1 < posts.length ? posts[index + 1] : posts[0],),
+                            ),
+                            feedback: PostCard(post: posts[index]),
+                            onDragStarted: onDragStarted,
+                            onDragCompleted: () {
+                              if (index + 1 < posts.length) {
+                                setState(() {
+                                  ++index;
+                                });
+                              } else {
+                                setState(() {
+                                  index = 0;
+                                });
+                              }
+                            },
+                            onDragEnd: (_) {},
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(CupertinoPageRoute(builder: (_) => PostDetailPage(color: Colors.blue)));
+                              },
+                              child: Hero(
+                                tag: "main",
+                                child: PostCard(post: posts[index]),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: DragTarget(
+                          onAccept: (_) {
+                            print("liked");
+                          },
+                          builder: (_, __, ___) {
+                            return Container();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              Flexible(
-                flex: 1,
-                child: DragTarget(
-                  onAccept: (_) {
-                    print("liked");
-                  },
-                  builder: (_, __, ___) {
-                    return Container();
-                  },
-                ),
-              ),
-            ],
-          ),
+                );
+              }else{
+                return Center(
+                  child: Text('No posts'),
+                );
+              }
+            }else{
+              return CircularProgressIndicator();
+            }
+          }
         ));
   }
 
