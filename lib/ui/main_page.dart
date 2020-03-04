@@ -17,6 +17,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   PageController pageController = PageController();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Post> posts = [];
 
@@ -71,9 +72,45 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
         floatingActionButton: FloatingActionButton(child: Icon(Icons.add),onPressed: (){
           Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PostEditPage()));
         }),
+        appBar: AppBar(
+          title: Text('SellIt'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.account_circle),
+              onPressed: () {
+                _scaffoldKey.currentState.openEndDrawer();
+              },
+            ),
+          ],
+        ),
+        endDrawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              DrawerHeader(
+                child: Text('Drawer Header'),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+              ),
+              ListTile(
+                title: Text('Item 1'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('Item 2'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
         body: StreamBuilder(
           stream: postBloc.posts,
           builder: (_, AsyncSnapshot<List<Post>> snapshot){
