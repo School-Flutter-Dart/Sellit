@@ -7,6 +7,7 @@ import 'package:sellit/bloc/post_bloc.dart';
 import 'components/post_card.dart';
 import 'post_detail_page.dart';
 import 'post_edit_page.dart';
+import 'chat_home_page.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -91,21 +92,34 @@ class _MainPageState extends State<MainPage> {
           child: ListView(
             children: <Widget>[
               DrawerHeader(
-                child: Text('Drawer Header'),
+                child: Text('(Username)'),
                 decoration: BoxDecoration(
                   color: Colors.blue,
                 ),
               ),
               ListTile(
-                title: Text('Item 1'),
+                title: Text('Account'),
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
               ListTile(
-                title: Text('Item 2'),
+                title: Text('Marked as Buy'),
                 onTap: () {
                   Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('Sell'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('Chat'),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatHome()),
+                  );
                 },
               ),
             ],
