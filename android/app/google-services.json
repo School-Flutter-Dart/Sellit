@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "828215326689",
+    "firebase_url": "https://sellit-50eb9.firebaseio.com",
+    "project_id": "sellit-50eb9",
+    "storage_bucket": "sellit-50eb9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828215326689:android:4479bd65c3a135112b44a0",
+        "android_client_info": {
+          "package_name": "jiaqifeng.sellit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828215326689-vemrafc607f282u1le48usqeq64m0or3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMv5rjP5eMejiG3Zqnkb4f5oXqEnb-Jms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828215326689-vemrafc607f282u1le48usqeq64m0or3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "828215326689-smbm59vkfigfl26rdr519mv4i2380vu4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "as"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
