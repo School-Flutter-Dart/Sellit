@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/uuid_util.dart';
 
+import 'package:sellit/resources/cloud_firestore_provider.dart';
+
 import '../bloc/post_bloc.dart';
 
 class PostEditPage extends StatefulWidget {
@@ -25,9 +27,16 @@ class _PostEditPageState extends State<PostEditPage> {
           String title = titleController.text;
           String content = contentController.text;
           double price = double.parse(priceController.text);
-          postBloc.uploadPost(Post(title: title, content: content, price: price, postId: Uuid().v4()));
+          postBloc.uploadPost(Post(
+              title: title,
+              content: content,
+              price: price,
+              postId: Uuid().v4(),
+              postedDate: DateTime.now(),
+              postUserId: firestore_provider.firebaseUser.uid,
+              postUserDisplayName: firestore_provider.firebaseUser.displayName));
           Navigator.pop(context);
-          Navigator.push(context, MaterialPageRoute(builder: (_)=>DonePage()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => DonePage()));
         },
       ),
       body: Column(
