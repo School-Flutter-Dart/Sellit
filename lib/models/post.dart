@@ -12,10 +12,13 @@ class Post{
   double price;
   String postId;
   String postUserId;
+  String postUserDisplayName;
   ///The bytes data of images of the post.
   List<List<int>> imageBytes;
 
-  Post({this.content, this.title, this.postId, this.postUserId, this.price});
+  DateTime postedDate;
 
-  Post.createNewPost({this.content, this.title, this.postUserId, this.price}):postId = Uuid().v4();
+  Post({this.content, this.title, this.postId, this.postUserId, this.postUserDisplayName,this.price, this.postedDate});
+
+  Post.createNewPost({this.content, this.title, this.postUserId, this.postUserDisplayName,this.price}):postId = Uuid().v4(), postedDate = DateTime.now();
 }

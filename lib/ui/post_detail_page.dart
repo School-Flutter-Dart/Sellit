@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:sellit/bloc/post_bloc.dart';
 
 class PostDetailPage extends StatefulWidget {
-  final Color color;
+  final Post post;
 
-  PostDetailPage({this.color});
+  PostDetailPage({this.post});
 
   @override
   _PostDetailPageState createState() => _PostDetailPageState();
@@ -19,6 +19,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -33,7 +34,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
           color: Colors.blue,
           child: Stack(
             children: <Widget>[
-
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width,
+                  child: Image.asset('assets/turtlerock.jpg', fit: BoxFit.cover,),
+                ),
+              )
             ],
           ),
         ),
