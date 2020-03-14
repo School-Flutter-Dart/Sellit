@@ -9,9 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'components/post_card.dart';
 import 'post_detail_page.dart';
 import 'post_edit_page.dart';
+
 import 'register_page.dart';
 import 'sign_in_page.dart';
 import 'profile_page.dart';
+
+import 'chat_home_page.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -101,6 +104,7 @@ class _MainPageState extends State<MainPage> {
         endDrawer: Drawer(
           child: ListView(
             children: <Widget>[
+
               ListTile(
                 title: Text(firestore_provider?.firebaseUser?.displayName ?? "Not signed in"),
                 onTap: () {
@@ -126,6 +130,19 @@ class _MainPageState extends State<MainPage> {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => SignInPage())).then((value) {
                     setState(() {});
                   });
+                },
+              ),
+              ListTile(
+                title: Text('Sell'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('Chat'),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatHome()),
+                  );
                 },
               ),
             ],
