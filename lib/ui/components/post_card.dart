@@ -21,14 +21,17 @@ class _PostCardState extends State<PostCard> {
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
       child: Container(
-        height: MediaQuery.of(context).size.height*0.7,
-        width: MediaQuery.of(context).size.width*0.8,
+        height: MediaQuery.of(context).size.height * 0.7,
+        width: MediaQuery.of(context).size.width * 0.8,
         decoration: BoxDecoration(
           color: widget.color,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         child: Flex(
           direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Flexible(
               flex: 5,
@@ -41,17 +44,38 @@ class _PostCardState extends State<PostCard> {
               ),
             ),
             Flexible(
-              flex: 3,
-              child: Container(
-                child: Flex(
-                  direction: Axis.vertical,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Text("\$${widget.post.price.toString()}", style: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),),
-                    )
-                  ],
-                ),
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text(
+                    "${widget.post.title}",
+                    style: TextStyle(fontSize: 24, backgroundColor: Colors.black54),
+                  ),
+                )),
+            Flexible(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text(
+                    "${widget.post.content}",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                )),
+            Flexible(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text(
+                    "\$${widget.post.price.toString()}",
+                    style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                  ),
+                )),
+            Spacer(),
+            Padding(
+              padding: EdgeInsets.only(bottom: 0, left: 12),
+              child: Text(
+                "Posted by ${widget.post.postUserDisplayName ?? "Null"}",
+                style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
               ),
             )
           ],
