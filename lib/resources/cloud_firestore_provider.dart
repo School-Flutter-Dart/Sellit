@@ -126,6 +126,9 @@ class CloudFirestoreProvider {
       if (authResult.user.isEmailVerified) {
         UserUpdateInfo updateInfo = UserUpdateInfo();
 
+        /*The SJSU email format is FiretName.LasName@SJSU.com,
+        Therefore we directly take the name from the email address provided using regular expression.
+         */
         String nameString = RegExp(r'^[a-zA-Z0-9_.+-]+(?=@)').firstMatch(email).group(0).trim();
         List<String> strs = nameString.split(".");
         String firstName = strs[0];
@@ -137,6 +140,7 @@ class CloudFirestoreProvider {
 
         saveEmailAndPassword(email, password);
 
+        //Update the profile using the name we got from email.
         return authResult.user.updateProfile(updateInfo).then((value) {
           firebaseUser = authResult.user;
 
@@ -152,6 +156,7 @@ class CloudFirestoreProvider {
     });
   }
 
+  ///Sign in user silently if previously signed in.
   Future<FirebaseUser> signInUserSilently() async {
     final sharedPrefs = await SharedPreferences.getInstance();
     String email = sharedPrefs.getString('email');
@@ -168,6 +173,7 @@ class CloudFirestoreProvider {
     }
   }
 
+  ///Store the email and password in shared preferences
   static Future saveEmailAndPassword(String email, String password) async {
     final sharedPrefs = await SharedPreferences.getInstance();
     sharedPrefs.setString('email', email);
