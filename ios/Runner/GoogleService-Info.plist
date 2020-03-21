@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>828215326689-q2h59899gfp2j964mhra4efb8omtfr26.apps.googleusercontent.com</string>
+	<string>567757415613-min228ensij4j8u3bc9gvkrmismjbfrb.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.828215326689-q2h59899gfp2j964mhra4efb8omtfr26</string>
+	<string>com.googleusercontent.apps.567757415613-min228ensij4j8u3bc9gvkrmismjbfrb</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDm2EnDGRQQZF6vmgGcWOJqJt07KOEjBIM</string>
+	<string>AIzaSyDQaPUfeWolYt58aMvmsSlf9nHw8i6FpCw</string>
 	<key>GCM_SENDER_ID</key>
-	<string>828215326689</string>
+	<string>567757415613</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>jiaqifeng.sellit</string>
 	<key>PROJECT_ID</key>
-	<string>sellit-50eb9</string>
+	<string>sellit-1af12</string>
 	<key>STORAGE_BUCKET</key>
-	<string>sellit-50eb9.appspot.com</string>
+	<string>sellit-1af12.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:828215326689:ios:1d7bddd864359e802b44a0</string>
+	<string>1:567757415613:ios:01151108a671a777f603d4</string>
 	<key>DATABASE_URL</key>
-	<string>https://sellit-50eb9.firebaseio.com</string>
+	<string>https://sellit-1af12.firebaseio.com</string>
 </dict>
 </plist>

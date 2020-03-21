@@ -139,6 +139,7 @@ class CloudFirestoreProvider {
 
         return authResult.user.updateProfile(updateInfo).then((value) {
           firebaseUser = authResult.user;
+
           //upload user data onto Cloud Firestore
           uploadUser(firebaseUser);
 
