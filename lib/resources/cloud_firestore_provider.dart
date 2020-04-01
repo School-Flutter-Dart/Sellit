@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:core';
-
-import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:sellit/models/post.dart';
 
@@ -14,31 +15,50 @@ export 'package:sellit/models/post.dart';
 class CloudFirestoreProvider {
   FirebaseUser firebaseUser;
 
-  Future<List<Post>> fetchAllPosts() async {
-    return Firestore.instance.collection('posts').getDocuments().then((QuerySnapshot qs) {
-      var posts = List<Post>();
+  Stream<Post> fetchAllPosts() async* {
+    var qs = await Firestore.instance.collection('posts').getDocuments();
 
-      for (var s in qs.documents) {
-        String title = s['title'];
-        String content = s['content'];
-        double price = s['price'] * 1.0;
-        String postId = s.documentID;
-        String postUserUid = s['postUserUid'];
-        String postUserDisplayName = s['postUserDisplayName'];
-        DateTime postedDate = DateTime.parse(s['postedDate'] ?? "2020-04-09").toLocal();
+    var posts = List<Post>();
 
-        posts.add(Post(
-            title: title,
-            content: content,
-            postId: postId,
-            price: price,
-            postUserId: postUserUid,
-            postUserDisplayName: postUserDisplayName,
-            postedDate: postedDate));
+    for (var s in qs.documents) {
+      print(s.documentID);
+      List<String> imagePaths = s['imagePaths'] == null ? [] : (s['imagePaths'] as List).cast<String>();
+      print(imagePaths.length);
+
+      String title = s['title'];
+      String content = s['content'];
+      double price = s['price'] * 1.0;
+      String postId = s.documentID;
+      String postUserUid = s['postUserUid'];
+      String postUserDisplayName = s['postUserDisplayName'];
+
+      DateTime postedDate = DateTime.parse(s['postedDate'] ?? "2020-04-09").toLocal();
+
+      print("done");
+      //print("The first path is ${imagePaths[0]} and the runtime type is ${imagePaths[0]}");
+
+      for (int i = 0; i < imagePaths.length; i++) {
+        var reference = FirebaseStorage.instance.ref().child(imagePaths[i]);
+        imagePaths[i] = await reference.getDownloadURL();
       }
 
-      return posts;
-    });
+      yield Post(
+          title: title,
+          content: content,
+          postId: postId,
+          price: price,
+          postUserId: postUserUid,
+          postUserDisplayName: postUserDisplayName,
+          postedDate: postedDate,
+          imagePaths: imagePaths);
+    }
+  }
+
+  Future<List<int>> getImageBytesByPath(String path) async {
+    print("the path is $path");
+    var reference = FirebaseStorage.instance.ref().child(path);
+    var imageBytes = await reference.getData(5000000);
+    return imageBytes;
   }
 
   Future addLikedPost(Post post) async {
@@ -49,7 +69,52 @@ class CloudFirestoreProvider {
     }
   }
 
+  static bool hasImage(List<List<int>> imageBytes) {
+    for (var bytes in imageBytes) {
+      if (bytes != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Future uploadPost(Post post) async {
+    List<String> imagePaths = [];
+    for (int i = 0; i < post.imageBytes.length; i++) {
+      if (post.imageBytes[i] != null) {
+        String path = post.postId + i.toString();
+        print(path);
+        imagePaths.add(path);
+        final StorageReference storageReference = FirebaseStorage().ref().child(path);
+
+//        var compressBytes = await FlutterImageCompress.compressWithList(post.imageBytes[i]).then((value) {
+//          print("compressed");
+//
+//          return value;
+//        });
+
+        print("compressed 2");
+
+        final StorageUploadTask uploadTask = storageReference.putData(post.imageBytes[i]);
+
+        final StreamSubscription<StorageTaskEvent> streamSubscription = uploadTask.events.listen((event) {
+          // You can use this to notify yourself or your user in any kind of way.
+          // For example: you could use the uploadTask.events stream in a StreamBuilder instead
+          // to show your user what the current status is. In that case, you would not need to cancel any
+          // subscription as StreamBuilder handles this automatically.
+
+          // Here, every StorageTaskEvent concerning the upload is printed to the logs.
+          print('======================EVENT ${event.type} ======================');
+        });
+
+// Cancel your subscription when done.
+        await uploadTask.onComplete;
+        streamSubscription.cancel();
+      } else {
+        break;
+      }
+    }
+
     return Firestore.instance.collection('posts').document(post.postId).setData({
       'postUserUid': post.postUserId,
       'postUserDisplayName': post.postUserDisplayName,
@@ -57,6 +122,7 @@ class CloudFirestoreProvider {
       'title': post.title,
       'content': post.content,
       'price': post.price,
+      'imagePaths': imagePaths
     }).whenComplete(() {
       Firestore.instance.collection('users').document(firebaseUser.uid).updateData({
         'postedIds': FieldValue.arrayUnion([post.postId])
@@ -77,7 +143,7 @@ class CloudFirestoreProvider {
     });
   }
 
-  Future<List<String>> fetchLikedIds() async{
+  Future<List<String>> fetchLikedIds() async {
     return Firestore.instance.collection('users').document(firebaseUser.uid).get().then((snapshot) {
       return (snapshot.data['likedIds'] as List).cast<String>();
     });
@@ -126,6 +192,9 @@ class CloudFirestoreProvider {
       if (authResult.user.isEmailVerified) {
         UserUpdateInfo updateInfo = UserUpdateInfo();
 
+        /*The SJSU email format is FiretName.LasName@SJSU.com,
+        Therefore we directly take the name from the email address provided using regular expression.
+         */
         String nameString = RegExp(r'^[a-zA-Z0-9_.+-]+(?=@)').firstMatch(email).group(0).trim();
         List<String> strs = nameString.split(".");
         String firstName = strs[0];
@@ -137,6 +206,7 @@ class CloudFirestoreProvider {
 
         saveEmailAndPassword(email, password);
 
+        //Update the profile using the name we got from email.
         return authResult.user.updateProfile(updateInfo).then((value) {
           firebaseUser = authResult.user;
 
@@ -152,6 +222,7 @@ class CloudFirestoreProvider {
     });
   }
 
+  ///Sign in user silently if previously signed in.
   Future<FirebaseUser> signInUserSilently() async {
     final sharedPrefs = await SharedPreferences.getInstance();
     String email = sharedPrefs.getString('email');
@@ -168,6 +239,7 @@ class CloudFirestoreProvider {
     }
   }
 
+  ///Store the email and password in shared preferences
   static Future saveEmailAndPassword(String email, String password) async {
     final sharedPrefs = await SharedPreferences.getInstance();
     sharedPrefs.setString('email', email);

@@ -104,7 +104,6 @@ class _MainPageState extends State<MainPage> {
         endDrawer: Drawer(
           child: ListView(
             children: <Widget>[
-
               ListTile(
                 title: Text(firestore_provider?.firebaseUser?.displayName ?? "Not signed in"),
                 onTap: () {
@@ -141,7 +140,9 @@ class _MainPageState extends State<MainPage> {
               ListTile(
                 title: Text('Chat'),
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatHome()),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChatHome()),
                   );
                 },
               ),
