@@ -14,6 +14,8 @@ export 'package:sellit/models/post.dart';
 class CloudFirestoreProvider {
   FirebaseUser firebaseUser;
 
+  final CollectionReference userInfo = Firestore.instance.collection('userInfo');
+
   Future<List<Post>> fetchAllPosts() async {
     return Firestore.instance.collection('posts').getDocuments().then((QuerySnapshot qs) {
       var posts = List<Post>();
@@ -173,6 +175,10 @@ class CloudFirestoreProvider {
     sharedPrefs.setString('email', email);
     sharedPrefs.setString('password', password);
   }
+
+
+
+
 }
 
 final firestore_provider = CloudFirestoreProvider();

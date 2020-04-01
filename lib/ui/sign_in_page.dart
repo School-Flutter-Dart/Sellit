@@ -70,6 +70,7 @@ class _SignInPageState extends State<SignInPage> {
                     firestore_provider.signInUser(email, password).then((value) {
                       if (value != null) {
                         Navigator.pop(context);
+                         print(value.uid);
                       } else {
                         scaffoldKey.currentState.showSnackBar(SnackBar(
                           content: Text('Signing in failed. Please check your email if you are the first time user.'),

@@ -15,7 +15,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordVerificationEditingController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
-  String enrolledClass = '';
+
 
   @override
   void dispose() {
@@ -31,9 +31,8 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(),
       body: Form(
           key: formKey,
-          child: Column(
+          child: SingleChildScrollView(child: Column(
             children: <Widget>[
-
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                 child: TextFormField(
@@ -82,27 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
 
-              Container(
-                  margin: EdgeInsets.all(20),
-                  child: TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'enrolled Classes',
-                    ),
-                    onChanged: (text) {
-                      setState(() {
-                        enrolledClass = text;
-                        //you can access nameController in its scope to get
-                        // the value of text entered as shown below
-                        //fullName = nameController.text;
-                      });
-                    },
-                  )),
-              Container(
-                margin: EdgeInsets.all(20),
-                child: Text(enrolledClass),
-              ),
+
               RaisedButton(
                 onPressed: () {
                   if (formKey.currentState.validate()) {
@@ -114,11 +93,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     });
                   }
                 },
-                child: Text('Submit'),
+                child: Text('Create User'),
               )
 
             ],
           )),
+      ),
+
     );
   }
 }
