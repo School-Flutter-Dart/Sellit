@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sellit/resources/cloud_firestore_provider.dart';
 import 'package:sellit/ui/components/post_list_tile.dart';
 import 'post_detail_page.dart';
-import 'User_PersonalInfo_page.dart';
+import 'User_Info.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -66,13 +66,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ListTile(
                 title: Text('Personal'),
                 onTap: () {
+
                   // Update the state of the app.
                   // ...
                   Navigator.pop(context);
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (_) => ProfilePage()))
-                      .then((value) {
-                    setState(() {});
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => User_Info())).then((value) {
+                  setState(() {});
                   });
                 },
               ),
@@ -105,7 +104,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   builder: (_, AsyncSnapshot<List<Post>> snapshot) {
                     if (snapshot.hasData) {
                       var posts = snapshot.data;
-
                       return ListView(
                         children: posts.map((e) => PostListTile(post: e)).toList(),
                       );

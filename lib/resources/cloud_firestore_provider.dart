@@ -87,10 +87,12 @@ class CloudFirestoreProvider {
 
   Future<List<Post>> fetchPostsByPostIds(List<String> ids) async {
     List<Post> posts = [];
+    for(var s in ids)
 
     for (var id in ids) {
-      var post = await Firestore.instance.collection('posts').document(id).get().then((s) {
-        String title = s['title'];
+        var post = await Firestore.instance.collection('posts').document(id).get().then((s) {
+         print(s);
+          String title = s['title'];
         String content = s['content'];
         double price = s['price'] * 1.0;
         String postId = s.documentID;
