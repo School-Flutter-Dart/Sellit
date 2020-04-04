@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:sellit/models/post.dart';
-
+import 'package:sellit/resources/cloud_firestore_provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 export 'package:sellit/models/post.dart';
 
 class PostCard extends StatefulWidget {
@@ -38,7 +39,10 @@ class _PostCardState extends State<PostCard> {
               child: Container(
                 width: double.infinity,
                 child: ClipRRect(
-                  child: Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover),
+//                  child: Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover),
+                  child: widget.post.imagePaths == null || widget.post.imagePaths.isEmpty
+                      ? Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover)
+                      : FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: widget.post.imagePaths[0], fit: BoxFit.cover,),
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                 ),
               ),
@@ -49,7 +53,7 @@ class _PostCardState extends State<PostCard> {
                   padding: EdgeInsets.all(12),
                   child: Text(
                     "${widget.post.title}",
-                    style: TextStyle(fontSize: 24, backgroundColor: Colors.black54),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 )),
             Flexible(
