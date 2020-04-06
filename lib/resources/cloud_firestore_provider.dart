@@ -15,16 +15,16 @@ export 'package:sellit/models/post.dart';
 class CloudFirestoreProvider {
   FirebaseUser firebaseUser;
 
-<<<<<<< HEAD
-  final CollectionReference userInfo = Firestore.instance.collection('userInfo');
-
-  Future<List<Post>> fetchAllPosts() async {
-    return Firestore.instance.collection('posts').getDocuments().then((QuerySnapshot qs) {
-      var posts = List<Post>();
-=======
+//<<<<<<< HEAD
+//  final CollectionReference userInfo = Firestore.instance.collection('userInfo');
+//
+//  Future<List<Post>> fetchAllPosts() async {
+//    return Firestore.instance.collection('posts').getDocuments().then((QuerySnapshot qs) {
+//      var posts = List<Post>();
+//=======
   Stream<Post> fetchAllPosts() async* {
     var qs = await Firestore.instance.collection('posts').getDocuments();
->>>>>>> origin/master
+//>>>>>>> origin/master
 
     var posts = List<Post>();
 
@@ -158,28 +158,31 @@ class CloudFirestoreProvider {
   }
 
   Future<List<Post>> fetchPostsByPostIds(List<String> ids) async {
-    List<Post> posts = [];
-    for(var s in ids)
+     List<Post> posts = [];
 
     for (var id in ids) {
         var post = await Firestore.instance.collection('posts').document(id).get().then((s) {
-         print(s);
-          String title = s['title'];
-        String content = s['content'];
-        double price = s['price'] * 1.0;
-        String postId = s.documentID;
-        String postUserUid = s['postUserUid'];
-        String postUserDisplayName = s['postUserDisplayName'];
-        DateTime postedDate = DateTime.parse(s['postedDate'] ?? "2020-04-09").toLocal();
+          if(s.exists)
+          {
+            String title = s['title'];
+            String content = s['content'];
+            double price = s['price'] * 1.0;
+            String postId = s.documentID;
+            String postUserUid = s['postUserUid'];
+            String postUserDisplayName = s['postUserDisplayName'];
+            DateTime postedDate = DateTime.parse(
+                s['postedDate'] ?? "2020-04-09").toLocal();
 
-        return Post(
-            title: title,
-            content: content,
-            postId: postId,
-            price: price,
-            postUserId: postUserUid,
-            postUserDisplayName: postUserDisplayName,
-            postedDate: postedDate);
+            return Post(
+                title: title,
+                content: content,
+                postId: postId,
+                price: price,
+                postUserId: postUserUid,
+                postUserDisplayName: postUserDisplayName,
+                postedDate: postedDate);
+          }
+          return null;
       });
 
       posts.add(post);
