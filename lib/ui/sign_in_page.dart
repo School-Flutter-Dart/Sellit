@@ -37,6 +37,7 @@ class _SignInPageState extends State<SignInPage> {
                   controller: emailTextEditingController,
                   decoration: InputDecoration(hintText: 'Enter your SJSU email address', labelText: 'SJSU email'),
                   autovalidate: false,
+                  autocorrect: false,
                   validator: (String value) {
                     if (RegExp(r'^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z]+\.)?(sjsu|sjsu2|SJSU|SJSU2)\.edu$').hasMatch(value)) {
                       return null;

@@ -20,11 +20,13 @@ class PostBloc{
   }
 
   void uploadPost(Post post){
-    repo.uploadPost(post);
-
-    _posts.add(post);
-
-    _postsFetcher.sink.add(_posts);
+    repo.uploadPost(post).whenComplete((){
+      postBloc.fetchAllPosts();
+    });
+//
+//    _posts.add(post);
+//
+//    _postsFetcher.sink.add(_posts);
   }
 
   dispose(){

@@ -42,6 +42,7 @@ class _PostEditPageState extends State<PostEditPage> {
                   postUserId: firestore_provider.firebaseUser.uid,
                   postUserDisplayName: firestore_provider.firebaseUser.displayName,
                   imageBytes: imageBytes));
+              postBloc.fetchAllPosts();
               Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (_) => DonePage()));
             }
