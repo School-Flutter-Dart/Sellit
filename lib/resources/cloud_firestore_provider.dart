@@ -239,6 +239,14 @@ class CloudFirestoreProvider {
     }
   }
 
+  Future signOut() async {
+    final sharedPrefs = await SharedPreferences.getInstance();
+    sharedPrefs.remove('email');
+    sharedPrefs.remove('password');
+    firebaseUser = null;
+    FirebaseAuth.instance.signOut();
+  }
+
   ///Store the email and password in shared preferences
   static Future saveEmailAndPassword(String email, String password) async {
     final sharedPrefs = await SharedPreferences.getInstance();
