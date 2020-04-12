@@ -21,25 +21,25 @@ class Message {
 
 //Current CustomElementRegistry
 final User currentUser = User(
-  uuid: "0",
+  id: 0,
   email: "currentUser@sjsu.edu",
   displayName: "Current User",
 );
 
 final User greg = User(
-  uuid: "1",
+  id: 1,
   email: "greg@sjsu.edu",
   displayName: "Greg",
 );
 
 final User james = User(
-  uuid: "2",
+  id: 2,
   email: "james@sjsu.edu",
   displayName: "James",
 );
 
 final User olivia = User(
-  uuid: "3",
+  id: 3,
   email: "olivia@sjsu.edu",
   displayName: "Olivia",
 );

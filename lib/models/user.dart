@@ -5,7 +5,10 @@ class User {
   String email;
   String displayName;
 
-  User({this.uuid, this.email, this.displayName});
+  int id;
+
+  //User({this.uuid, this.email, this.displayName});
+  User({this.uuid, this.id, this.email, this.displayName});
 
   User.createNewUser({this.email, this.displayName}){
     uuid = Uuid().v4();

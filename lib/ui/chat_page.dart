@@ -27,7 +27,7 @@ class _ChatPageState extends State<ChatPage> {
       padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
       width: MediaQuery.of(context).size.width * 0.75,
       decoration: BoxDecoration(
-        color: isMe ? Colors.red : Colors.white,
+        color: isMe ? Theme.of(context).accentColor : Colors.cyan,
         borderRadius: isMe
             ? BorderRadius.only(
           topLeft: Radius.circular(15.0),
@@ -44,16 +44,15 @@ class _ChatPageState extends State<ChatPage> {
           Text(
             message.time,
             style: TextStyle(
-              color: Colors.blueGrey,
+              color: Colors.white,
               fontSize: 16.0,
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 8.0),
           Text(
             message.text,
             style: TextStyle(
-              color: Colors.blueGrey,
+              color: Colors.white,
               fontSize: 16.0,
               fontWeight: FontWeight.w600,
             ),
@@ -76,7 +75,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             icon: Icon(Icons.photo),
             iconSize: 25.0,
-            color: Colors.red,
+            color: Theme.of(context).primaryColor,
             onPressed: () {},
           ),
           Expanded(
@@ -91,7 +90,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             icon: Icon(Icons.send),
             iconSize: 25.0,
-            color: Colors.red,
+            color: Theme.of(context).primaryColor,
             onPressed: () {},
           ),
         ],
@@ -102,7 +101,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
         title: Text(
           widget.user.displayName,
@@ -116,7 +115,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             icon: Icon(Icons.more_horiz),
             iconSize: 30.0,
-            color: Colors.red,
+            color: Colors.white,
             onPressed: () {},
           ),
         ],
@@ -145,7 +144,7 @@ class _ChatPageState extends State<ChatPage> {
                     itemCount: messages.length,
                     itemBuilder: (BuildContext context, int index) {
                       final Message message = messages[index];
-                      final bool isMe = message.sender.uuid == currentUser.uuid;
+                      final bool isMe = message.sender.id == currentUser.id;
                       return _buildMessage(message, isMe);
                     },
                   ),
