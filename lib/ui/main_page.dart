@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sellit/bloc/post_bloc.dart';
 import 'package:sellit/resources/cloud_firestore_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'components/post_card.dart';
 import 'post_detail_page.dart';
@@ -83,152 +84,176 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => PostEditPage()));
-            }),
-        appBar: AppBar(
-          title: Text('SellIt'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.account_circle),
-              onPressed: () {
-                _scaffoldKey.currentState.openEndDrawer();
-              },
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.onAuthStateChanged,
+      builder: (_, AsyncSnapshot<FirebaseUser> snapshot) {
+        var user = snapshot.data;
+        firestore_provider.firebaseUser = user;
+        return Scaffold(
+            key: _scaffoldKey,
+            floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.add),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => PostEditPage()));
+                }),
+            appBar: AppBar(
+              title: Text('SellIt'),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.account_circle),
+                  onPressed: () {
+                    _scaffoldKey.currentState.openEndDrawer();
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-        endDrawer: Drawer(
-          child: ListView(
-            children: <Widget>[
+            endDrawer: Drawer(
+              child: ListView(
+                children: <Widget>[
+                  ListTile(
+                    title: Text(user?.displayName ?? "Not signed in"),
+//                    title: Text(firestore_provider?.firebaseUser?.displayName ?? "Not signed in"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage())).then((value) {
+                        setState(() {});
+                      });
+                    },
+                  ),
+                  if (user == null)
+                    ListTile(
+                      title: Text('Register'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage())).then((value) {
+                          setState(() {});
+                        });
+                      },
+                    ),
+                  if (user == null)
+                    ListTile(
+                      title: Text('Sign In'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => SignInPage())).then((value) {
+                          setState(() {});
+                        });
+                      },
+                    ),
+                  if (user != null)
+                    ListTile(
+                      title: Text('Sign Out'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => SignInPage())).then((value) {
+                          setState(() {});
+                        });
+                        firestore_provider.signOut();
+                      },
+                    ),
+                  ListTile(
+                    title: Text('Sell'),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Chat'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ChatHome()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            body: StreamBuilder(
+                stream: postBloc.posts,
+                builder: (_, AsyncSnapshot<List<Post>> snapshot) {
+                  if (snapshot.hasData) {
+                    posts = snapshot.data;
 
-              ListTile(
-                title: Text(firestore_provider?.firebaseUser?.displayName ?? "Not signed in"),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage())).then((value) {
-                    setState(() {});
-                  });
-                },
-              ),
-              ListTile(
-                title: Text('Register'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage())).then((value) {
-                    setState(() {});
-                  });
-                },
-              ),
-              ListTile(
-                title: Text('Sign In'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => SignInPage())).then((value) {
-                    setState(() {});
-                  });
-                },
-              ),
-              ListTile(
-                title: Text('Sell'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: Text('Chat'),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatHome()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        body: StreamBuilder(
-            stream: postBloc.posts,
-            builder: (_, AsyncSnapshot<List<Post>> snapshot) {
-              if (snapshot.hasData) {
-                posts = snapshot.data;
-
-                if (posts.isNotEmpty) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Flexible(
-                          flex: 1,
-                          child: DragTarget(
-                            onAccept: (_) {
-                              print("unliked");
-                            },
-                            builder: (_, __, ___) {
-                              return Container();
-                            },
-                          ),
-                        ),
-                        Stack(
+                    if (posts.isNotEmpty) {
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          mainAxisSize: MainAxisSize.max,
                           children: <Widget>[
-                            Draggable(
-                              data: posts[index],
-                              childWhenDragging: Transform.scale(
-                                scale: 0.9,
-                                child: PostCard(
-                                  post: index + 1 < posts.length ? posts[index + 1] : posts[0],
-                                ),
-                              ),
-                              feedback: PostCard(post: posts[index]),
-                              onDragStarted: onDragStarted,
-                              onDragCompleted: () {
-                                if (index + 1 < posts.length) {
-                                  setState(() {
-                                    ++index;
-                                  });
-                                } else {
-                                  setState(() {
-                                    index = 0;
-                                  });
-                                }
-                              },
-                              onDragEnd: (_) {},
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(CupertinoPageRoute(builder: (_) => PostDetailPage(post: posts[index])));
+                            Flexible(
+                              flex: 1,
+                              child: DragTarget(
+                                onAccept: (_) {
+                                  print("unliked");
                                 },
-                                child: Hero(
-                                  tag: "main",
-                                  child: PostCard(post: posts[index]),
+                                builder: (_, __, ___) {
+                                  return Container();
+                                },
+                              ),
+                            ),
+                            Stack(
+                              children: <Widget>[
+                                Draggable(
+                                  data: posts[index],
+                                  childWhenDragging: Transform.scale(
+                                    scale: 0.9,
+                                    child: PostCard(
+                                      post: index + 1 < posts.length ? posts[index + 1] : posts[0],
+                                    ),
+                                  ),
+                                  feedback: PostCard(post: posts[index]),
+                                  onDragStarted: onDragStarted,
+                                  onDragCompleted: () {
+                                    if (index + 1 < posts.length) {
+                                      setState(() {
+                                        ++index;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        index = 0;
+                                      });
+                                    }
+                                  },
+                                  onDragEnd: (_) {},
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(CupertinoPageRoute(builder: (_) => PostDetailPage(post: posts[index])));
+                                    },
+                                    child: Hero(
+                                      tag: "main",
+                                      child: PostCard(post: posts[index]),
+                                    ),
+                                  ),
                                 ),
+                              ],
+                            ),
+                            Flexible(
+                              flex: 1,
+                              child: DragTarget(
+                                onAccept: onLiked,
+                                builder: (_, __, ___) {
+                                  return Container();
+                                },
                               ),
                             ),
                           ],
                         ),
-                        Flexible(
-                          flex: 1,
-                          child: DragTarget(
-                            onAccept: onLiked,
-                            builder: (_, __, ___) {
-                              return Container();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return Center(
-                    child: Text('No posts'),
-                  );
-                }
-              } else {
-                return CircularProgressIndicator();
-              }
-            }));
+                      );
+                    } else {
+                      return Center(
+                        child: Text('No posts'),
+                      );
+                    }
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }));
+      },
+    );
   }
 
   void onLiked(Post post) {

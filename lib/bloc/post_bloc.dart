@@ -13,18 +13,20 @@ class PostBloc{
   Stream<List<Post>> get posts => _postsFetcher.stream;
 
   void fetchAllPosts(){
-    repo.fetchAllPosts().then((value){
-      _posts.addAll(value);
+    repo.fetchAllPosts().listen((data){
+      _posts.add(data);
       _postsFetcher.sink.add(_posts);
     });
   }
 
   void uploadPost(Post post){
-    repo.uploadPost(post);
-
-    _posts.add(post);
-
-    _postsFetcher.sink.add(_posts);
+    repo.uploadPost(post).whenComplete((){
+      postBloc.fetchAllPosts();
+    });
+//
+//    _posts.add(post);
+//
+//    _postsFetcher.sink.add(_posts);
   }
 
   dispose(){
