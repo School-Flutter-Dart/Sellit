@@ -23,6 +23,7 @@ class _ChatPageState extends State<ChatPage> {
           : EdgeInsets.only(
         top: 8.0,
         bottom: 8.0,
+        right: 80.0,
       ),
       padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
       width: MediaQuery.of(context).size.width * 0.75,
@@ -60,9 +61,7 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
-    if (isMe) {
-      return msg;
-    }
+    return msg;
   }
 
   _buildMessageComposer() {
@@ -72,12 +71,6 @@ class _ChatPageState extends State<ChatPage> {
       color: Colors.white,
       child: Row(
         children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.photo),
-            iconSize: 25.0,
-            color: Theme.of(context).primaryColor,
-            onPressed: () {},
-          ),
           Expanded(
             child: TextField(
               textCapitalization: TextCapitalization.sentences,
@@ -112,12 +105,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         elevation: 0.0,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.more_horiz),
-            iconSize: 30.0,
-            color: Colors.white,
-            onPressed: () {},
-          ),
+          //Put icon button if more actions wanted
         ],
       ),
       body: GestureDetector(
@@ -145,6 +133,7 @@ class _ChatPageState extends State<ChatPage> {
                     itemBuilder: (BuildContext context, int index) {
                       final Message message = messages[index];
                       final bool isMe = message.sender.id == currentUser.id;
+                      print(message.text);
                       return _buildMessage(message, isMe);
                     },
                   ),

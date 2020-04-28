@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sellit/ui/components/chats.dart';
+import 'package:sellit/ui/new_chat.dart';
 
 class ChatHome extends StatefulWidget {
   @override
@@ -11,13 +12,12 @@ class _ChatHomeState extends State<ChatHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => NewChatPage()));
+          }),
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          iconSize: 30.0,
-          color: Colors.white,
-          onPressed: () {},
-        ),
         title: Text(
           'Chats',
           style: TextStyle(
@@ -27,12 +27,7 @@ class _ChatHomeState extends State<ChatHome> {
         ),
         elevation: 0.0,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            iconSize: 30.0,
-            color: Colors.white,
-            onPressed: () {},
-          ),
+          // Put icon button if more actions wanted
         ],
       ),
       body: Column(
