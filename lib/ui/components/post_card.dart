@@ -28,60 +28,54 @@ class _PostCardState extends State<PostCard> {
           color: widget.color,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        child: Flex(
-          direction: Axis.vertical,
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            Flexible(
-              flex: 5,
-              child: Container(
-                width: double.infinity,
-                child: ClipRRect(
+            Container(
+              width: double.infinity,
+              child: ClipRRect(
 //                  child: Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover),
-                  child: widget.post.imagePaths == null || widget.post.imagePaths.isEmpty
-                      ? Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover)
-                      : FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: widget.post.imagePaths[0], fit: BoxFit.cover,),
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-                ),
+                child: widget.post.imagePaths == null || widget.post.imagePaths.isEmpty
+                    ? Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover)
+                    : FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: widget.post.imagePaths[0], fit: BoxFit.cover,),
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
               ),
             ),
-            Flexible(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Text(
-                    "${widget.post.title}",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                )),
-            Flexible(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Text(
-                    "${widget.post.content}",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                )),
-            Flexible(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Text(
-                    "\$${widget.post.price.toString()}",
-                    style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
-                  ),
-                )),
-            Spacer(),
             Padding(
-              padding: EdgeInsets.only(bottom: 0, left: 12),
+              padding: EdgeInsets.all(12),
               child: Text(
-                "Posted by ${widget.post.postUserDisplayName ?? "Null"}",
-                style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                "${widget.post.title}",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: Text(
+                "${widget.post.content}",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: Text(
+                "\$${widget.post.price.toString()}",
+                style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+              ),
+            ),
+            Spacer(),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 12, right: 12),
+                child: Text(
+                  "Posted by ${widget.post.postUserDisplayName ?? "Null"}",
+                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                ),
               ),
             )
+
           ],
         ),
       ),
