@@ -28,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
       padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
       width: MediaQuery.of(context).size.width * 0.75,
       decoration: BoxDecoration(
-        color: isMe ? Theme.of(context).accentColor : Colors.cyan,
+        color: isMe ? Theme.of(context).accentColor : Colors.amberAccent[700],
         borderRadius: isMe
             ? BorderRadius.only(
           topLeft: Radius.circular(15.0),
@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatPage> {
           Text(
             message.time,
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.grey[300],
               fontSize: 16.0,
               fontWeight: FontWeight.w600,
             ),
