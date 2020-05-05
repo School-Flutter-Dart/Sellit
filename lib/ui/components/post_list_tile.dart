@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:sellit/models/post.dart';
 
@@ -31,20 +32,16 @@ class _PostListTileState extends State<PostListTile> {
                 Container(
                   width: 100,
                   height: 100,
-                  child: Image.asset('assets/turtlerock.jpg'),
+                  child: FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: widget.post.imagePaths[0], fit: BoxFit.cover),
                 ),
                 Padding(
                   padding: EdgeInsets.all(12),
-                  child: Text(
-                    widget.post.title
-                  ),
+                  child: Text(widget.post.title),
                 ),
                 Spacer(),
                 Padding(
                   padding: EdgeInsets.all(12),
-                  child: Text(
-                      widget.post.price.toString()
-                  ),
+                  child: Text("\$${widget.post.price.toString()}"),
                 ),
               ],
             ),
@@ -54,11 +51,9 @@ class _PostListTileState extends State<PostListTile> {
     );
   }
 
-  void onTapped(){
+  void onTapped() {
     Navigator.of(context).push(CupertinoPageRoute(builder: (_) => PostDetailPage(post: widget.post)));
   }
 
-  void onLongPressed(){
-
-  }
+  void onLongPressed() {}
 }
