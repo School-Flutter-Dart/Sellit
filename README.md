@@ -2,6 +2,16 @@
 
 A new Flutter application.
 
+## Installation Guide
+
+First make sure you have installed Flutter SDK and Dart SDK. The later one should be installed automatically once you installed Flutter SDK.
+
+For Android devices, make sure you have installed Android emulator.
+
+For iOS devices, you have to have a Mac in order to run it on either a physically iPhone or iPhone simulator.
+
+After Flutter is installed, in the project directory, run `flutter run` in terminal.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
