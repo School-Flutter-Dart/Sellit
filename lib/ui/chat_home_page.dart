@@ -1,162 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:sellit/models/message.dart';
+
+import 'package:sellit/bloc/msg_bloc.dart';
+import 'package:sellit/resources/cloud_firestore_provider.dart';
 import 'package:sellit/ui/chat_page.dart';
 
-class ChatHome extends StatefulWidget {
+class ChatHomePage extends StatefulWidget {
   @override
-  _ChatHomeState createState() => _ChatHomeState();
+  _ChatHomePageState createState() => _ChatHomePageState();
 }
 
-class _ChatHomeState extends State<ChatHome> {
+class _ChatHomePageState extends State<ChatHomePage> {
+  @override
+  void initState() {
+    msgBloc.fetchAllChats();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat'),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
+      appBar: AppBar(),
+      body: StreamBuilder(
+        stream: msgBloc.chats,
+        builder: (_, AsyncSnapshot<List<Chat>> snapshot) {
+          if (snapshot.hasData) {
+            var chats = snapshot.data;
 
-              }
-          ),
-        ],
+            return ListView(
+              children: chats.map((chat) {
+                return ChatListTile(uid: chat.uid);
+              }).toList(),
+            );
+          }
+
+          return CircularProgressIndicator();
+        },
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
-                ),
-              ),
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30.0),
-                          topRight: Radius.circular(30.0),
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30.0),
-                          topRight: Radius.circular(30.0),
-                        ),
-                        child: ListView.builder(
-                          itemCount: chats.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final Message chat = chats[index];
-                            return GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ChatPage(
-                                    user: chat.sender,
-                                  ),
-                                ),
-                              ),
-                              child: Container(
-                                margin: EdgeInsets.only(top: 5.0, bottom: 5.0, right: 20.0),
-                                padding:
-                                EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                                decoration: BoxDecoration(
-                                  color: chat.unread ? Colors.red : Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(30.0),
-                                    topRight: Radius.circular(30.0),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        CircleAvatar(
-                                          radius: 35.0,
-                                          backgroundImage: AssetImage("assets/turtlerock.jpg"),
-                                        ),
-                                        SizedBox(width: 10.0),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              chat.sender.displayName,
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 15.0,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(height: 5.0),
-                                            Container(
-                                              width: MediaQuery.of(context).size.width * 0.45,
-                                              child: Text(
-                                                chat.text,
-                                                style: TextStyle(
-                                                  color: Colors.blueGrey,
-                                                  fontSize: 15.0,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: <Widget>[
-                                        Text(
-                                          chat.time,
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 15.0,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(height: 5.0),
-                                        chat.unread
-                                            ? Container(
-                                          width: 40.0,
-                                          height: 20.0,
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius: BorderRadius.circular(30.0),
-                                          ),
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'NEW',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        )
-                                            : Text(''),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    );
+  }
+}
+
+class ChatListTile extends StatelessWidget {
+  final String uid;
+
+  ChatListTile({this.uid});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: firestoreProvider.fetchUserNameByUid(uid),
+      builder: (_, AsyncSnapshot<String> snapshot) {
+        if (snapshot.hasData) {
+          var name = snapshot.data;
+
+          return ListTile(
+            title: Text(name),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => ChatPage(otherUid: uid)));
+            },
+          );
+        }
+        return Container();
+      },
     );
   }
 }

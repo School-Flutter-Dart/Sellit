@@ -30,41 +30,21 @@ class _MainPageState extends State<MainPage> {
 
   List<Post> posts = [];
 
-//  List<Widget> cards = <Widget>[
-//    PostCard(
-//      color: Colors.black12,
-//      post: Post.createNewPost(title: "Something", price: 2.99, content: "this works great"),
-//    ),
-//    PostCard(
-//      color: Colors.pink,
-//      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
-//    ),
-//    PostCard(
-//      color: Colors.purple,
-//      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
-//    ),
-//    PostCard(
-//      color: Colors.tealAccent,
-//      post: Post.createNewPost(title: "Something", price: 12.99, content: "this works great"),
-//    ),
-//  ];
-
   Widget child;
 
   double angle = 0;
 
   int index = 0;
 
+  Category currentCategory = Category.all;
+
   @override
   void initState() {
     super.initState();
 
-    firestore_provider.signInUserSilently().whenComplete(() {
+    firestoreProvider.signInUserSilently().whenComplete(() {
       setState(() {});
     });
-
-//    Firestore.instance.collection('books').document()
-//        .setData({ 'title': 'title', 'author': 'author' });
 
     postBloc.fetchAllPosts();
 
@@ -88,7 +68,13 @@ class _MainPageState extends State<MainPage> {
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (_, AsyncSnapshot<FirebaseUser> snapshot) {
         var user = snapshot.data;
-        firestore_provider.firebaseUser = user;
+        firestoreProvider.firebaseUser = user;
+
+        print("user is $user");
+        if (user != null) {
+          print('user email is ${user.email}');
+        }
+
         return Scaffold(
             key: _scaffoldKey,
             floatingActionButton: FloatingActionButton(
@@ -99,6 +85,46 @@ class _MainPageState extends State<MainPage> {
             appBar: AppBar(
               title: Text('SellIt'),
               actions: <Widget>[
+                DropdownButton<Category>(
+                    selectedItemBuilder: (context) {
+                      return [
+                        Container(
+                          width: 64,
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 18),
+                              child: Text(categoryToString(currentCategory)),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 18),
+                          child: Text(categoryToString(currentCategory)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 18),
+                          child: Text(categoryToString(currentCategory)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 18),
+                          child: Text(categoryToString(currentCategory)),
+                        ),
+                      ];
+                    },
+                    value: currentCategory,
+                    style: TextStyle(color: Colors.white),
+                    items: [
+                      for (var category in Category.values)
+                        DropdownMenuItem<Category>(value: category, child: Text(categoryToString(category), style: TextStyle(color: Colors.black)))
+                    ],
+                    onChanged: (Category category) {
+                      print("current category: $category");
+                      postBloc.fetchAllPosts(category: category);
+                      index = 0;
+                      setState(() {
+                        currentCategory = category;
+                      });
+                    }),
                 IconButton(
                   icon: Icon(Icons.account_circle),
                   onPressed: () {
@@ -111,7 +137,7 @@ class _MainPageState extends State<MainPage> {
               child: ListView(
                 children: <Widget>[
                   ListTile(
-                    title: Text(user?.displayName ?? "Not signed in"),
+                    title: Text(user?.displayName ?? "George Fung"),
 //                    title: Text(firestore_provider?.firebaseUser?.displayName ?? "Not signed in"),
                     onTap: () {
                       Navigator.pop(context);
@@ -148,7 +174,7 @@ class _MainPageState extends State<MainPage> {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => SignInPage())).then((value) {
                           setState(() {});
                         });
-                        firestore_provider.signOut();
+                        firestoreProvider.signOut();
                       },
                     ),
                   ListTile(
@@ -162,7 +188,7 @@ class _MainPageState extends State<MainPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ChatHome()),
+                        MaterialPageRoute(builder: (context) => ChatHomePage()),
                       );
                     },
                   ),
@@ -185,8 +211,9 @@ class _MainPageState extends State<MainPage> {
                             Flexible(
                               flex: 1,
                               child: DragTarget(
-                                onAccept: (_) {
-                                  print("unliked");
+                                onAccept: (Post post) {
+                                  print("remove ${posts[index]}");
+                                  postBloc.removePosts(post);
                                 },
                                 builder: (_, __, ___) {
                                   return Container();
@@ -258,7 +285,7 @@ class _MainPageState extends State<MainPage> {
 
   void onLiked(Post post) {
     print("liked ${post.title}");
-    firestore_provider.addLikedPost(post);
+    firestoreProvider.addLikedPost(post);
   }
 
   void onDragStarted() {

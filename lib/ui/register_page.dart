@@ -84,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (formKey.currentState.validate()) {
                     String email = emailTextEditingController.text;
                     String password = passwordEditingController.text;
-                    firestore_provider.registerNewUser(email, password).whenComplete((){
+                    firestoreProvider.registerNewUser(email, password).whenComplete((){
                       //firestore_provider.signInUser(email, password);
                       Navigator.pop(context);
                     });

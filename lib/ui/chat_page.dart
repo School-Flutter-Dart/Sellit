@@ -1,161 +1,112 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sellit/models/message.dart';
-import 'package:sellit/models/user.dart';
+
+import 'package:sellit/bloc/msg_bloc.dart';
+import 'package:sellit/resources/cloud_firestore_provider.dart';
 
 class ChatPage extends StatefulWidget {
-  final User user;
+  final String otherUid;
 
-  ChatPage({this.user});
+  ChatPage({this.otherUid});
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  _buildMessage(Message message, bool isMe) {
-    final Container msg = Container(
-      margin: isMe
-          ? EdgeInsets.only(
-        top: 8.0,
-        bottom: 8.0,
-        left: 80.0,
-      )
-          : EdgeInsets.only(
-        top: 8.0,
-        bottom: 8.0,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-      width: MediaQuery.of(context).size.width * 0.75,
-      decoration: BoxDecoration(
-        color: isMe ? Colors.red : Colors.white,
-        borderRadius: isMe
-            ? BorderRadius.only(
-          topLeft: Radius.circular(15.0),
-          bottomLeft: Radius.circular(15.0),
-        )
-            : BorderRadius.only(
-          topRight: Radius.circular(15.0),
-          bottomRight: Radius.circular(15.0),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            message.time,
-            style: TextStyle(
-              color: Colors.blueGrey,
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 8.0),
-          Text(
-            message.text,
-            style: TextStyle(
-              color: Colors.blueGrey,
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-    if (isMe) {
-      return msg;
-    }
-  }
-
-  _buildMessageComposer() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
-      height: 70.0,
-      color: Colors.white,
-      child: Row(
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.photo),
-            iconSize: 25.0,
-            color: Colors.red,
-            onPressed: () {},
-          ),
-          Expanded(
-            child: TextField(
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (value) {},
-              decoration: InputDecoration.collapsed(
-                hintText: 'Send a message...',
-              ),
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.send),
-            iconSize: 25.0,
-            color: Colors.red,
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
-  }
+  final editingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          widget.user.displayName,
-          style: TextStyle(
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.more_horiz),
-            iconSize: 30.0,
-            color: Colors.red,
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30.0),
-                    topRight: Radius.circular(30.0),
+      appBar: AppBar(),
+      body: StreamBuilder<List<Message>>(
+          stream: firestoreProvider.getMessageStream(widget.otherUid),
+          initialData: [Message(text: 'test - this means no messages exist', isSelf: true)],
+          builder: (_, AsyncSnapshot<List<Message>> snapshot) {
+            var msgs = snapshot.data ?? [];
+            print(msgs);
+            return Container(
+              color: Colors.lightBlue,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    top: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    bottom: 64,
+                    child: ListView(
+                      shrinkWrap: true,
+                      reverse: true ,
+                      children: msgs.map((msg) {
+                        if (msg.isSelf) {
+                          return Padding(
+                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.3, right: 12, top: 4, bottom: 4),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                                  color: Colors.white70,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Text(
+                                    msg.text,
+                                    textAlign: TextAlign.right,
+                                  ),
+                                )),
+                          );
+                        } else {
+                          return Padding(
+                            padding: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.3, left: 12, top: 4, bottom: 4),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                                  color: Colors.white70,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Text(msg.text),
+                                )),
+                          );
+                        }
+                      }).toList(),
+                    ),
                   ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30.0),
-                    topRight: Radius.circular(30.0),
-                  ),
-                  child: ListView.builder(
-                    reverse: true,
-                    padding: EdgeInsets.only(top: 15.0),
-                    itemCount: messages.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final Message message = messages[index];
-                      final bool isMe = message.sender.uuid == currentUser.uuid;
-                      return _buildMessage(message, isMe);
-                    },
-                  ),
-                ),
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        color: Colors.lightBlueAccent,
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                                width: MediaQuery.of(context).size.width - 48,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  child: TextField(
+                                    controller: editingController,
+                                    decoration: InputDecoration(hintText: "Enter message here", border: InputBorder.none),
+                                  ),
+                                )),
+                            Container(
+                              width: 48,
+                              child: IconButton(
+                                icon: Icon(Icons.send),
+                                onPressed: () {
+                                  if (editingController.text.trim().isNotEmpty) {
+                                    msgBloc.sendMessage(editingController.text.trim(), widget.otherUid);
+                                    editingController.clear();
+                                  }
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ))
+                ],
               ),
-            ),
-            _buildMessageComposer(),
-          ],
-        ),
-      ),
+            );
+          }),
     );
   }
 }
