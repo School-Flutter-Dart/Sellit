@@ -68,7 +68,10 @@ class _SignInPageState extends State<SignInPage> {
                   if (formKey.currentState.validate()) {
                     String email = emailTextEditingController.text;
                     String password = passwordEditingController.text;
-                    firestore_provider.signInUser(email, password).then((value) {
+                    firestoreProvider.signInUser(email, password).then((value) {
+                      if (value is Exception) {
+                        print(value);
+                      }
                       if (value != null) {
                         Navigator.pop(context);
                       } else {
@@ -77,17 +80,30 @@ class _SignInPageState extends State<SignInPage> {
                           action: SnackBarAction(label: 'Resend', onPressed: onResendTapped),
                         ));
                       }
+                    }).catchError((Object err) {
+                      scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err.toString())));
                     });
                   }
                 },
                 child: Text('Sign In'),
-              )
+              ),
+              RaisedButton(
+                onPressed: () {
+                  if (RegExp(r'^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z]+\.)?(sjsu|sjsu2|SJSU|SJSU2)\.edu$')
+                      .hasMatch(emailTextEditingController.text)) {
+                    String email = emailTextEditingController.text;
+                    firestoreProvider.forgetPassword(email);
+                    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('An password reset link has been sent to your email address.')));
+                  }
+                },
+                child: Text('Forgot Password'),
+              ),
             ],
           )),
     );
   }
 
-  void onResendTapped(){
-    firestore_provider.firebaseUser.sendEmailVerification();
+  void onResendTapped() {
+    firestoreProvider.firebaseUser.sendEmailVerification();
   }
 }

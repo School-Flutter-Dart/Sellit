@@ -36,10 +36,14 @@ class _PostCardState extends State<PostCard> {
             Container(
               width: double.infinity,
               child: ClipRRect(
-//                  child: Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover),
                 child: widget.post.imagePaths == null || widget.post.imagePaths.isEmpty
                     ? Image.asset("assets/turtlerock.jpg", fit: BoxFit.cover)
-                    : FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: widget.post.imagePaths[0], fit: BoxFit.cover,),
+                    : FadeInImage.memoryNetwork(
+                        placeholder: kTransparentImage,
+                        image: widget.post.imagePaths[0],
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.width * 0.8,
+                      ),
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
               ),
             ),
@@ -75,7 +79,6 @@ class _PostCardState extends State<PostCard> {
                 ),
               ),
             )
-
           ],
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:uuid/uuid.dart';
@@ -22,13 +23,62 @@ class _PostEditPageState extends State<PostEditPage> {
 
   List<List<int>> imageBytes = List<List<int>>(4);
 
+  Category currentCategory = Category.electronics;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          actions: <Widget>[
+            DropdownButton<Category>(
+                selectedItemBuilder: (context) {
+                  return Category.values
+                      .sublist(0, Category.values.length)
+                      .map((category) => Container(
+                            width: 96,
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 18),
+                                child: Text(categoryToString(currentCategory)),
+                              ),
+                            ),
+                          ))
+                      .toList();
+                },
+                value: currentCategory,
+                style: TextStyle(color: Colors.white),
+                items: [
+                  for (var category in Category.values.sublist(0, Category.values.length))
+                    DropdownMenuItem<Category>(value: category, child: Text(categoryToString(category), style: TextStyle(color: Colors.black)))
+                ],
+                onChanged: (Category category) {
+                  setState(() {
+                    currentCategory = category;
+                  });
+                }),
+          ],
+        ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.file_upload),
           onPressed: () {
+            if (imageBytes.first == null) {
+              showCupertinoDialog(
+                  context: context,
+                  builder: (_) {
+                    return CupertinoAlertDialog(
+                      title: Text('Must include at least one image'),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          child: Text('Okay'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        )
+                      ],
+                    );
+                  });
+              return;
+            }
             if (formKey.currentState.validate()) {
               String title = titleController.text;
               String content = contentController.text;
@@ -37,10 +87,11 @@ class _PostEditPageState extends State<PostEditPage> {
                   title: title,
                   content: content,
                   price: price,
+                  category: currentCategory,
                   postId: Uuid().v4(),
                   postedDate: DateTime.now(),
-                  postUserId: firestore_provider.firebaseUser.uid,
-                  postUserDisplayName: firestore_provider.firebaseUser.displayName,
+                  postUserId: firestoreProvider.firebaseUser.uid,
+                  postUserDisplayName: firestoreProvider.firebaseUser.displayName,
                   imageBytes: imageBytes));
               postBloc.fetchAllPosts();
               Navigator.pop(context);
@@ -94,14 +145,13 @@ class _PostEditPageState extends State<PostEditPage> {
                     decoration: InputDecoration(hintText: 'Title'),
                     maxLengthEnforced: true,
                     maxLength: 50,
-                    validator: (str){
-                      if(str.trim().isEmpty){
+                    validator: (str) {
+                      if (str.trim().isEmpty) {
                         return "Title cannot be empty";
                       }
                       return null;
                     },
                   ),
-
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 48, vertical: 12),
@@ -118,10 +168,10 @@ class _PostEditPageState extends State<PostEditPage> {
                   child: TextFormField(
                     controller: priceController,
                     decoration: InputDecoration(hintText: 'Price'),
-                    validator: (str){
-                      if(double.tryParse(str) == null){
+                    validator: (str) {
+                      if (double.tryParse(str) == null) {
                         return "Invalid price";
-                      }else
+                      } else
                         return null;
                     },
                   ),
@@ -129,8 +179,7 @@ class _PostEditPageState extends State<PostEditPage> {
               ],
             ),
           ),
-        )
-    );
+        ));
   }
 
   void onAddPhotoTapped(int index) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:sellit/resources/cloud_firestore_provider.dart';
 import 'package:sellit/ui/components/post_list_tile.dart';
@@ -24,25 +25,97 @@ class _ProfilePageState extends State<ProfilePage> {
                   TabBar(
                     tabs: <Widget>[
                       Tab(
-                        text: 'Sold',
+                        text: 'Posted',
                       ),
                       Tab(
                         text: 'Liked',
                       ),
                       Tab(
-                        text: 'Bought',
+                        text: 'Sold',
                       )
                     ],
                   )),
               body: TabBarView(children: [
                 FutureBuilder(
-                  future: firestore_provider.fetchLikedIds().then((ids) => firestore_provider.fetchPostsByPostIds(ids)),
+                  future: firestoreProvider.fetchPostedIds().then((ids) => firestoreProvider.fetchPostsByPostIds(ids)),
                   builder: (_, AsyncSnapshot<List<Post>> snapshot) {
                     if (snapshot.hasData) {
                       var posts = snapshot.data;
 
+                      if(posts.isEmpty){
+                        return Center(
+                          child: Text('No posted posts'),
+                        );
+                      }
+
                       return ListView(
-                        children: posts.map((e) => PostListTile(post: e)).toList(),
+                        children: posts
+                            .map((e) => PostListTile(
+                                  post: e,
+                                  onLongPressed: () {
+                                    showCupertinoModalPopup(
+                                        context: context,
+                                        builder: (_) {
+                                          return CupertinoActionSheet(
+                                            actions: <Widget>[
+                                              CupertinoActionSheetAction(
+                                                  onPressed: () {
+                                                    firestoreProvider.deletePost(e).whenComplete(() {
+                                                      setState(() {});
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Delete')),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                ))
+                            .toList(),
+                      );
+                    } else {
+                      return Center(
+                        child: Text('No posted items'),
+                      );
+                    }
+                  },
+                ),
+                FutureBuilder(
+                  future: firestoreProvider.fetchLikedIds().then((ids) => firestoreProvider.fetchPostsByPostIds(ids)),
+                  builder: (_, AsyncSnapshot<List<Post>> snapshot) {
+                    if (snapshot.hasData) {
+                      var posts = snapshot.data;
+
+                      if(posts.isEmpty){
+                        return Center(
+                          child: Text('No liked posts'),
+                        );
+                      }
+
+                      return ListView(
+                        children: posts
+                            .map((e) => PostListTile(
+                                  post: e,
+                                  onLongPressed: () {
+                                    showCupertinoModalPopup(
+                                        context: context,
+                                        builder: (_) {
+                                          return CupertinoActionSheet(
+                                            actions: <Widget>[
+                                              CupertinoActionSheetAction(
+                                                  onPressed: () {
+                                                    firestoreProvider.deleteLikedIds(e.postId).whenComplete(() {
+                                                      setState(() {});
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Delete')),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                ))
+                            .toList(),
                       );
                     } else {
                       return Center(
@@ -52,33 +125,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 ),
                 FutureBuilder(
-                  future: firestore_provider.fetchLikedIds().then((ids) => firestore_provider.fetchPostsByPostIds(ids)),
+                  future: firestoreProvider.fetchPostedIds().then((ids) => firestoreProvider.fetchSoldPostsByPostIds(ids)),
                   builder: (_, AsyncSnapshot<List<Post>> snapshot) {
                     if (snapshot.hasData) {
                       var posts = snapshot.data;
+
+                      if(posts.isEmpty){
+                        return Center(
+                          child: Text('No sold posts'),
+                        );
+                      }
 
                       return ListView(
                         children: posts.map((e) => PostListTile(post: e)).toList(),
                       );
                     } else {
                       return Center(
-                        child: Text('No liked posts'),
-                      );
-                    }
-                  },
-                ),
-                FutureBuilder(
-                  future: firestore_provider.fetchLikedIds().then((ids) => firestore_provider.fetchPostsByPostIds(ids)),
-                  builder: (_, AsyncSnapshot<List<Post>> snapshot) {
-                    if (snapshot.hasData) {
-                      var posts = snapshot.data;
-
-                      return ListView(
-                        children: posts.map((e) => PostListTile(post: e)).toList(),
-                      );
-                    } else {
-                      return Center(
-                        child: Text('No liked posts'),
+                        child: Text('No sold posts'),
                       );
                     }
                   },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:sellit/resources/cloud_firestore_provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import 'package:sellit/models/post.dart';
@@ -8,8 +9,9 @@ import 'package:sellit/ui/post_detail_page.dart';
 
 class PostListTile extends StatefulWidget {
   final Post post;
+  final VoidCallback onLongPressed;
 
-  PostListTile({this.post});
+  PostListTile({this.post, this.onLongPressed});
 
   @override
   _PostListTileState createState() => _PostListTileState();
@@ -55,5 +57,7 @@ class _PostListTileState extends State<PostListTile> {
     Navigator.of(context).push(CupertinoPageRoute(builder: (_) => PostDetailPage(post: widget.post)));
   }
 
-  void onLongPressed() {}
+  void onLongPressed() {
+    widget.onLongPressed();
+  }
 }

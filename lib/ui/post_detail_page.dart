@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:sellit/resources/cloud_firestore_provider.dart';
+import 'package:sellit/ui/chat_page.dart';
 
 import 'package:transparent_image/transparent_image.dart';
 
@@ -34,50 +37,100 @@ class _PostDetailPageState extends State<PostDetailPage> {
     for (var path in widget.post.imagePaths) {
       precacheImage(FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: path, fit: BoxFit.cover).image, context);
     }
-    return Hero(
-      tag: "main",
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-        ),
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: Colors.blue,
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width,
-                    child: PageView(
-                      scrollDirection: Axis.horizontal,
-                      children: <Widget>[
-                        for (var path in widget.post.imagePaths)
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.width,
-                              child: FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: path, fit: BoxFit.cover)),
-                      ],
-                    )),
-              ),
-              Padding(
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+      ),
+      floatingActionButton: widget.post.postUserId == firestoreProvider.firebaseUser.uid
+          ? FloatingActionButton(
+              child: Icon(Icons.edit),
+              onPressed: () {
+                showCupertinoModalPopup(
+                    context: context,
+                    builder: (_) {
+                      return CupertinoActionSheet(
+                        actions: <Widget>[
+                          CupertinoActionSheetAction(
+                              onPressed: () {
+                                firestoreProvider.deletePost(widget.post);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Delete')),
+                          CupertinoActionSheetAction(
+                              onPressed: () {
+                                firestoreProvider.markAsSold(widget.post);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Mark As Sold')),
+                        ],
+                      );
+                    });
+              })
+          : FloatingActionButton(
+              child: Icon(Icons.chat),
+              onPressed: () {
+                print("The other id is ${widget.post.postUserId}");
+                firestoreProvider.initChat(widget.post.postUserId).whenComplete((){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => ChatPage(
+                            otherUid: widget.post.postUserId,
+                          )));
+                });
+
+              }),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: Colors.blue,
+        child: Column(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width,
+                  child: PageView(
+                    scrollDirection: Axis.horizontal,
+                    children: <Widget>[
+                      for (var path in widget.post.imagePaths)
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.width,
+                            child: FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: path, fit: BoxFit.cover)),
+                    ],
+                  )),
+            ),
+            Padding(
                 padding: EdgeInsets.all(12),
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  child: Text(widget.post.title, style: TextStyle(color: Colors.white, fontSize: 24),),
-                )
-              ),
-              Padding(
+                  child: Text(
+                    widget.post.price.toString(),
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                )),
+            Padding(
                 padding: EdgeInsets.all(12),
-                child:Container(
+                child: Container(
                   width: MediaQuery.of(context).size.width,
-                  child: Text(widget.post.content, style: TextStyle(color: Colors.white, fontSize: 20),),
-                )
-              ),
-            ],
-          ),
+                  child: Text(
+                    widget.post.title,
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                )),
+            Padding(
+                padding: EdgeInsets.all(12),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Text(
+                    widget.post.content,
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                )),
+          ],
         ),
       ),
     );

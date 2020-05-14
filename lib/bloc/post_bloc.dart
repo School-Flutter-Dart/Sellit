@@ -5,22 +5,23 @@ import 'package:sellit/resources/repository.dart';
 
 export 'package:sellit/models/post.dart';
 
-class PostBloc{
+class PostBloc {
   BehaviorSubject<List<Post>> _postsFetcher = BehaviorSubject<List<Post>>();
 
   List<Post> _posts = [];
 
   Stream<List<Post>> get posts => _postsFetcher.stream;
 
-  void fetchAllPosts(){
-    repo.fetchAllPosts().listen((data){
+  void fetchAllPosts({Category category = Category.all}) {
+    _posts.clear();
+    repo.fetchAllPosts(category).listen((data) {
       _posts.add(data);
       _postsFetcher.sink.add(_posts);
     });
   }
 
-  void uploadPost(Post post){
-    repo.uploadPost(post).whenComplete((){
+  void uploadPost(Post post) {
+    repo.uploadPost(post).whenComplete(() {
       postBloc.fetchAllPosts();
     });
 //
@@ -29,7 +30,12 @@ class PostBloc{
 //    _postsFetcher.sink.add(_posts);
   }
 
-  dispose(){
+  void removePosts(Post post){
+    _posts.remove(post);
+    _postsFetcher.sink.add(_posts);
+  }
+
+  dispose() {
     _postsFetcher.close();
   }
 }
