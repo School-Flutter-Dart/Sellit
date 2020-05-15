@@ -80,7 +80,25 @@ class _MainPageState extends State<MainPage> {
             floatingActionButton: FloatingActionButton(
                 child: Icon(Icons.add),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => PostEditPage()));
+                  if (firestoreProvider.firebaseUser == null) {
+                    showCupertinoDialog(
+                        context: context,
+                        builder: (_) {
+                          return CupertinoAlertDialog(
+                            title: Text('You must sign in to post'),
+                            actions: <Widget>[
+                              CupertinoDialogAction(
+                                child: Text('Okay'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              )
+                            ],
+                          );
+                        });
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => PostEditPage()));
+                  }
                 }),
             appBar: AppBar(
               title: Text('SellIt'),
@@ -137,7 +155,7 @@ class _MainPageState extends State<MainPage> {
               child: ListView(
                 children: <Widget>[
                   ListTile(
-                    title: Text(user?.displayName ?? "George Fung"),
+                    title: Text(user?.displayName ?? user?.email ?? " "),
 //                    title: Text(firestore_provider?.firebaseUser?.displayName ?? "Not signed in"),
                     onTap: () {
                       Navigator.pop(context);
@@ -178,12 +196,6 @@ class _MainPageState extends State<MainPage> {
                       },
                     ),
                   ListTile(
-                    title: Text('Sell'),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ListTile(
                     title: Text('Chat'),
                     onTap: () {
                       Navigator.push(
@@ -212,8 +224,8 @@ class _MainPageState extends State<MainPage> {
                               flex: 1,
                               child: DragTarget(
                                 onAccept: (Post post) {
-                                  print("remove ${posts[index]}");
-                                  postBloc.removePosts(post);
+                                  //print("remove ${posts[index]}");
+                                  //postBloc.removePosts(post);
                                 },
                                 builder: (_, __, ___) {
                                   return Container();

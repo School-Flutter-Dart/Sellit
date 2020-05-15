@@ -46,7 +46,7 @@ class Post {
   Post.createNewPost({this.content, this.title, this.postUserId, this.postUserDisplayName, this.price, this.category})
       : postId = Uuid().v4(),
         postedDate = DateTime.now();
-        //status = Status.open;
+  //status = Status.open;
 
   Post.fromMap(Map map) {
     print("Inside fromMap : ${map['imagePaths']}");
@@ -77,6 +77,21 @@ String categoryToString(Category category) {
       return 'Clothes';
     case Category.textbook:
       return 'Textbook';
+    default:
+      throw Exception('Category not matched.');
+  }
+}
+
+List<String> categoryToLabels(Category category) {
+  switch (category) {
+    case Category.all:
+      return ['All'];
+    case Category.electronics:
+      return ['Electronics', 'Electronic', 'Technology', 'Gadget'];
+    case Category.clothes:
+      return ['Clothes', 'Cloth', 'Shirt', 'Dress', 'Jacket', 'Blazer', 'Outerwear', 'Clothing', 'Suit'];
+    case Category.textbook:
+      return ['Textbook', 'Book', 'Books', 'Text', 'Novel', 'Publication'];
     default:
       throw Exception('Category not matched.');
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:core';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,7 @@ import 'package:sellit/models/message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 
 import 'package:sellit/models/post.dart';
 
@@ -210,6 +212,23 @@ class CloudFirestoreProvider {
       'content': post.content,
       'price': post.price,
       'imagePaths': imagePaths,
+      'isSold': false
+    }).whenComplete(() {
+      Firestore.instance.collection('users').document(firebaseUser.uid).updateData({
+        'postedIds': FieldValue.arrayUnion([post.postId])
+      });
+    });
+  }
+
+  Future editPost(Post post) async {
+    return Firestore.instance.collection('posts').document(post.postId).updateData({
+      'postUserUid': post.postUserId,
+      'postUserDisplayName': post.postUserDisplayName,
+      'postedDate': post.postedDate.toUtc().toString(),
+      'categoryIndex': post.category.index,
+      'title': post.title,
+      'content': post.content,
+      'price': post.price,
       'isSold': false
     }).whenComplete(() {
       Firestore.instance.collection('users').document(firebaseUser.uid).updateData({
@@ -480,6 +499,32 @@ class CloudFirestoreProvider {
     final sharedPrefs = await SharedPreferences.getInstance();
     sharedPrefs.setString(emailKey, email);
     sharedPrefs.setString(pwKey, password);
+  }
+
+  ///return a list of words related to the object detected in the image
+  Future<List<String>> labelImage(File file) async {
+    final FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(file);
+    final ImageLabeler cloudLabeler = FirebaseVision.instance.cloudImageLabeler();
+    final List<ImageLabel> cloudLabels = await cloudLabeler.processImage(visionImage);
+
+    List<String> words = [];
+
+    for (ImageLabel label in cloudLabels) {
+      final String text = label.text;
+      final String entityId = label.entityId;
+      final double confidence = label.confidence;
+
+      print("text: $text, entityId: $entityId, confidence: $confidence");
+
+      if (text.contains(' ')) {
+        var tokens = text.split(' ');
+        words.addAll(tokens);
+      } else {
+        words.add(text);
+      }
+    }
+
+    return words;
   }
 }
 
