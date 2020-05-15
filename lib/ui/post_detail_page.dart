@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sellit/resources/cloud_firestore_provider.dart';
 import 'package:sellit/ui/chat_page.dart';
+import 'package:sellit/ui/post_edit_page.dart';
 
 import 'package:transparent_image/transparent_image.dart';
 
@@ -41,46 +42,55 @@ class _PostDetailPageState extends State<PostDetailPage> {
       appBar: AppBar(
         elevation: 0,
       ),
-      floatingActionButton: widget.post.postUserId == firestoreProvider.firebaseUser.uid
-          ? FloatingActionButton(
-              child: Icon(Icons.edit),
-              onPressed: () {
-                showCupertinoModalPopup(
-                    context: context,
-                    builder: (_) {
-                      return CupertinoActionSheet(
-                        actions: <Widget>[
-                          CupertinoActionSheetAction(
-                              onPressed: () {
-                                firestoreProvider.deletePost(widget.post);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              child: Text('Delete')),
-                          CupertinoActionSheetAction(
-                              onPressed: () {
-                                firestoreProvider.markAsSold(widget.post);
-                                Navigator.pop(context);
-                              },
-                              child: Text('Mark As Sold')),
-                        ],
-                      );
-                    });
-              })
-          : FloatingActionButton(
-              child: Icon(Icons.chat),
-              onPressed: () {
-                print("The other id is ${widget.post.postUserId}");
-                firestoreProvider.initChat(widget.post.postUserId).whenComplete((){
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => ChatPage(
-                            otherUid: widget.post.postUserId,
-                          )));
-                });
-
-              }),
+      floatingActionButton: Opacity(
+        opacity: firestoreProvider.firebaseUser == null ? 0 : 1,
+        child: firestoreProvider.firebaseUser != null && widget.post.postUserId == firestoreProvider.firebaseUser.uid
+            ? FloatingActionButton(
+                child: Icon(Icons.edit),
+                onPressed: () {
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (_) {
+                        return CupertinoActionSheet(
+                          actions: <Widget>[
+                            CupertinoActionSheetAction(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) => PostEditPage(postToBeEdited: widget.post)));
+                                },
+                                child: Text('Edit')),
+                            CupertinoActionSheetAction(
+                                onPressed: () {
+                                  firestoreProvider.markAsSold(widget.post);
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Mark As Sold')),
+                            CupertinoActionSheetAction(
+                                onPressed: () {
+                                  firestoreProvider.deletePost(widget.post);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                isDestructiveAction: true,
+                                child: Text('Delete')),
+                          ],
+                        );
+                      });
+                })
+            : FloatingActionButton(
+                child: Icon(Icons.chat),
+                onPressed: () {
+                  print("The other id is ${widget.post.postUserId}");
+                  firestoreProvider.initChat(widget.post.postUserId).whenComplete(() {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => ChatPage(
+                                  otherUid: widget.post.postUserId,
+                                )));
+                  });
+                }),
+      ),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -108,7 +118,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   child: Text(
-                    widget.post.price.toString(),
+                    "\$${widget.post.price.toString()}",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 )),
